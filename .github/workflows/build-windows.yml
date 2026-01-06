@@ -38,7 +38,7 @@ jobs:
           # Pas 'main.py' aan naar je entrypoint
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frankinator-windows
           path: dist/*.exe
