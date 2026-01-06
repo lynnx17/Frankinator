@@ -14,40 +14,28 @@ jobs:
         shell: powershell
 
     steps:
-      # 1️⃣ Checkout de code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Installeer Python 3.13
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.13
 
-      # 3️⃣ Ga naar de map waar je pyproject.toml staat
-      - name: Set working directory
-        run: echo "##[set-output name=dir;]Frankinator/Frankinator"
-        id: wd
-
-      # 4️⃣ Installeer dependencies met Poetry
-      - name: Install Poetry dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install poetry
           poetry install
-        working-directory: ./Frankinator/Frankinator
 
-      # 5️⃣ Build executable met PyInstaller
-      - name: Build with PyInstaller
+      - name: Build executable with PyInstaller
         run: |
           poetry run pyinstaller --onefile --windowed launch.py `
             --add-data "templates;templates" `
             --add-data "static;static"
-        working-directory: ./Frankinator/Frankinator
 
-      # 6️⃣ Upload artifact zodat je het kan downloaden
-      - name: Upload build artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: Frankinator-Windows
-          path: ./Frankinator/Frankinator/dist
+          path: ./dist
