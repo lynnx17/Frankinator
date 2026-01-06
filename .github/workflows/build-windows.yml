@@ -22,17 +22,22 @@ jobs:
           python-version: '3.14'
 
       - name: Install Poetry
-        shell: pwsh
-        run: |
-          # Download en installeer Poetry
-          Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing | python -
+    shell: pwsh
+    run: |
+      # Download de installer naar een tijdelijk bestand
+      $installer = "$env:TEMP\install-poetry.py"
+      Invoke-WebRequest -Uri https://install.python-poetry.org -OutFile $installer
 
-          # Voeg Poetry toe aan PATH voor deze sessie
-          $env:PATH += ";C:\Users\runneradmin\AppData\Roaming\Python\Scripts"
+      # Voer de installer uit met Python
+      python $installer
 
-          # Controleer dat het werkt
-          poetry --version
+      # Voeg Poetry toe aan PATH voor deze sessie
+      $poetryPath = "C:\Users\runneradmin\AppData\Roaming\Python\Scripts"
+      $env:PATH += ";$poetryPath"
 
+      # Controleer dat Poetry werkt
+      poetry --version
+      
       - name: Configure Poetry
         shell: pwsh
         run: |
