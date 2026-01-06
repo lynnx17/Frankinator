@@ -47,7 +47,7 @@ jobs:
       run: |
         poetry install --no-interaction --no-ansi
 
-    - name: Run build (example: PyInstaller)
+    - name: Run build (example PyInstaller)
       shell: pwsh
       run: |
         # Optioneel: bouw je exe of distributable
