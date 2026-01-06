@@ -2,9 +2,9 @@ name: Build Windows
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
+    branches: [main]
 
 jobs:
   build-windows:
@@ -14,19 +14,17 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Set up Python 3.14
+    - name: Setup Python 3.14
       uses: actions/setup-python@v4
       with:
-        python-version: '3.14'
+        python-version: 3.14
 
-    - name: Install Poetry
+    - name: Install and configure Poetry
       shell: pwsh
       run: |
-        # Download de installer naar een tijdelijk bestand
+        # Download en installeer Poetry
         $installer = "$env:TEMP\install-poetry.py"
         Invoke-WebRequest -Uri https://install.python-poetry.org -OutFile $installer
-
-        # Voer de installer uit met Python
         python $installer
 
         # Voeg Poetry toe aan PATH voor deze sessie
@@ -36,20 +34,22 @@ jobs:
         # Controleer installatie
         poetry --version
 
-    - name: Configure Poetry
-      shell: pwsh
-      run: |
-      poetry config virtualenvs.in-project true
-
+        # Configureer virtuele omgeving in projectmap
+        poetry config virtualenvs.in-project true
 
     - name: Install dependencies
       shell: pwsh
       run: |
         poetry install --no-interaction --no-ansi
 
-    - name: Run build (example PyInstaller)
+    - name: Build executable with PyInstaller
       shell: pwsh
       run: |
-        # Optioneel: bouw je exe of distributable
-        # Pas aan naar jouw build command
+        # Pas dit aan naar jouw build command
         poetry run pyinstaller --onefile frankinator.py
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Frankinator-Windows
+        path: dist/*.exe
