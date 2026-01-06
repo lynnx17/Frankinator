@@ -1,50 +1,44 @@
 name: Build Windows
 
-# Run workflow on push to main or when manually triggered
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  build:
+  build-windows:
     runs-on: windows-latest
 
     steps:
-      # 1. Checkout the repo
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      # 2. Set up Python
-      - name: Set up Python
+      - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
-          python-version: '3.13'
+          python-version: '3.11'
 
-      # 3. Upgrade pip
-      - name: Upgrade pip
-        run: python -m pip install --upgrade pip
+      - name: Install Poetry
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
 
-      # 4. Install Poetry and PyInstaller
+      - name: Configure Poetry
+        run: |
+          poetry config virtualenvs.in-project true
+
       - name: Install dependencies
         run: |
-          pip install poetry pyinstaller
+          poetry install --no-interaction --no-ansi
 
-      # 5. Install project dependencies using Poetry
-      - name: Install project dependencies
-        run: poetry install
-        working-directory: .  # ROOT of repo
-
-      # 6. Build executable with PyInstaller
-      - name: Build Windows executable
+      - name: Build executable with PyInstaller
         run: |
-          pyinstaller --onefile --windowed launch.py
-        working-directory: .  # ROOT of repo
+          poetry run pyinstaller --noconfirm --onefile main.py
+          # Pas 'main.py' aan naar je entrypoint
 
-      # 7. Upload the build artifact
-      - name: Upload executable
-        uses: actions/upload-artifact@v4
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
         with:
-          name: Frankinator-Windows
-          path: dist/launch.exe
+          name: frankinator-windows
+          path: dist/*.exe
