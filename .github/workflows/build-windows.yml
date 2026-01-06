@@ -1,33 +1,38 @@
+# .github/workflows/build-windows.yml
+name: Build Windows
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: windows-latest
+
     steps:
-      - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.13
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.13
 
-      - name: Install Poetry
-        run: python -m pip install --upgrade pip && pip install poetry
+    - name: Install Poetry
+      run: python -m pip install --upgrade pip && pip install poetry
 
-      - name: Install dependencies
-        run: poetry install
-        working-directory: ./Frankinator  # <--- pas dit aan naar de folder waar pyproject.toml staat
+    - name: Install dependencies
+      working-directory: ./Frankinator
+      run: poetry install --no-interaction --no-ansi
 
-      - name: Build Windows exe
-        run: |
-          poetry run pyinstaller ^
-            --onefile ^
-            --name Frankinator ^
-            --add-data "templates;templates" ^
-            --add-data "static;static" ^
-            launch.py
-        working-directory: ./Frankinator  # <--- ook hier
+    - name: Build executable with PyInstaller
+      working-directory: ./Frankinator
+      run: poetry run pyinstaller --onefile --windowed launch.py
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Frankinator-windows
-          path: ./Frankinator/dist/  # <--- path aanpassen
+    - name: Upload Windows executable
+      uses: actions/upload-artifact@v4
+      with:
+        name: Frankinator-Windows
+        path: ./Frankinator/dist/launch.exe
