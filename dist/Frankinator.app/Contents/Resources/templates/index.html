@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Frankinator - YouTube to MP3</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Aubrey&family=Momo+Signature&family=Pacifico&family=Roboto:ital,wght@0,100..900;1,100..900&family=Rubik+Bubbles&family=Rubik+Burned&family=Science+Gothic:wght@100..900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <h1>Frankinator</h1>
+    </header>
+
+
+    <div id="form">
+        <form action="/download" method="post">
+
+            <fieldset>
+                <label for="url">YouTube URL:</label><br>
+                <input type="text" id="url" name="url" required class="input"><br><br>
+
+                <label for="filename">kies een bestand naam (zonder .mp3):</label><br>
+                <input type="text" id="filename" name="filename" placeholder="Optional" class="input"><br><br>
+
+                <input type="submit" value="Download MP3" id="download-button">
+            </fieldset>
+        </form>
+    </div>
+
+    <img src="/static/kermit.webp" id="hidden" class="hello-kermit">
+
+    <img src="/static/laden.webp" id="laden-kermit" class="laden-kermit">
+
+    <script>
+const form = document.querySelector("form");
+const downloadBtn = document.getElementById("download-button");
+const helloKermit = document.querySelector(".hello-kermit");
+const ladenKermit = document.getElementById("laden-kermit");
+
+form.addEventListener("submit", async (e) => {
+    e.preventDefault(); // voorkom standaard form submit
+
+    // Verberg hello-kermit en toon laden-kermit
+    helloKermit.style.display = "none";
+    ladenKermit.style.display = "block";
+    downloadBtn.disabled = true;
+
+    const formData = new FormData(form);
+    try {
+        const response = await fetch("/download", {
+            method: "POST",
+            body: formData
+        });
+
+        if (!response.ok) throw new Error("Download mislukt");
+
+        // Hier weet je dat de server klaar is, haal het bestand
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = formData.get("filename") || "download.mp3";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        // Wissel terug naar hello-kermit
+        ladenKermit.style.display = "none";
+        helloKermit.style.display = "block";
+        downloadBtn.disabled = false;
+    } catch (err) {
+        alert(err);
+        ladenKermit.style.display = "none";
+        helloKermit.style.display = "block";
+        downloadBtn.disabled = false;
+    }
+});
+</script>
+
+</body>
+
+</html>
+
+

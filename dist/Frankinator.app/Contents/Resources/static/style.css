@@ -1,0 +1,101 @@
+@keyframes rotating {
+    from {
+        rotate: 0;
+    }
+
+    to {
+        rotate: 359deg;
+    }
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    background-color: #CADF9E;
+    font-family: "Aubrey", system-ui;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 25px;
+    overflow: hidden;
+}
+
+header {
+    background-color: #A4AC96;
+    text-align: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+h1 {
+    color: #313628;
+    font-family: "Rubik Bubbles", system-ui;
+    font-weight: 400;
+    font-style: normal;
+}
+
+fieldset {
+    width: 50%;
+    border-radius: 10px;
+    margin: auto;
+    margin-top: 8em;
+    margin-bottom: 2em;
+    border: 1px solid;
+    padding: 60px;
+    box-shadow: 5px 10px #595358;
+    background-color: #A4AC96;
+    text-align: center;
+}
+
+.input[type=text] {
+    border: 2px solid #313628;
+    border-radius: 15px;
+    width: 75%;
+    height: 30px;
+}
+
+.input[type=text]:focus {
+    background-color: #313628;
+    color: #CADF9E;
+}
+
+#download-button {
+    background-color: #857F74;
+    width: 200px;
+    height: auto;
+    padding: 10px;
+    font-size: 20px;
+    border-radius: 5px;
+    border: none;
+    color: #CADF9E;
+    font-family: "Rubik Bubbles", system-ui;
+    font-weight: 400;
+    font-style: normal;
+
+}
+
+#download-button:hover {
+    background-color: #595358;
+    color: #CADF9E;
+}
+
+.hello-kermit {
+    height: 300px;
+    width: auto;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+}
+
+.laden-kermit {
+      display: none;
+
+    height: 300px;
+    width: auto;
+    position: fixed;
+    animation: rotating 2s infinite;
+    animation-timing-function: ease-in-out;
+    bottom: 0;
+    left: 0;
+}
