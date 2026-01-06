@@ -2,51 +2,58 @@ name: Build Windows
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  build-windows:
+  build:
     runs-on: windows-latest
 
     steps:
-      # 1. Checkout code
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # 2. Setup Python 3.11
-      - name: Setup Python
+      - name: Set up Python 3.14
         uses: actions/setup-python@v4
         with:
-          python-version: 3.11
+          python-version: '3.14'
 
-      # 3. Install Poetry (nieuwere manier)
       - name: Install Poetry
+        shell: pwsh
         run: |
-          curl -sSL https://install.python-poetry.org | python -
-          # voeg Poetry toe via environment file
-          echo "C:\\Users\\runneradmin\\AppData\\Roaming\\Python\\Scripts" >> $GITHUB_PATH
+          # Download en installeer Poetry
+          Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing | python -
 
-      # 4. Configure Poetry voor project-venv
+          # Voeg Poetry toe aan PATH voor deze sessie
+          $env:PATH += ";C:\Users\runneradmin\AppData\Roaming\Python\Scripts"
+
+          # Controleer dat het werkt
+          poetry --version
+
       - name: Configure Poetry
-        run: poetry config virtualenvs.in-project true
+        shell: pwsh
+        run: |
+          $env:PATH += ";C:\Users\runneradmin\AppData\Roaming\Python\Scripts"
+          poetry config virtualenvs.in-project true
 
-      # 5. Zorg dat pythonnet compatibel is
-      - name: Pin pythonnet
-        run: poetry add pythonnet@2.5.1 --dev
-
-      # 6. Installeer dependencies
       - name: Install dependencies
-        run: poetry install --no-interaction --no-ansi
+        shell: pwsh
+        run: |
+          $env:PATH += ";C:\Users\runneradmin\AppData\Roaming\Python\Scripts"
+          poetry install --no-interaction --no-ansi
 
-      # 7. Build executable (optioneel)
-      - name: Build executable
-        run: poetry run pyinstaller --onefile your_main_script.py
+      - name: Run PyInstaller build
+        shell: pwsh
+        run: |
+          $env:PATH += ";C:\Users\runneradmin\AppData\Roaming\Python\Scripts"
+          # Pas hier aan naar jouw entry script
+          poetry run pyinstaller --onefile Frankinator.py
 
-      # 8. Upload artifact
-      - name: Upload artifact
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Frankinator-Windows-Build
-          path: dist/
+          name: frankinator-windows
+          path: dist/Frankinator.exe
