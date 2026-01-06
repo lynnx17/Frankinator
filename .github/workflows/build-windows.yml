@@ -11,17 +11,17 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      # 1. Checkout code
+      # 1️⃣ Checkout de code
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. Setup Python
-      - name: Setup Python 3.14
+      # 2️⃣ Setup Python (3.11, compatible met pythonnet)
+      - name: Setup Python 3.11
         uses: actions/setup-python@v4
         with:
-          python-version: 3.14
+          python-version: 3.11
 
-      # 3. Install Poetry en voeg toe aan PATH
+      # 3️⃣ Installeer Poetry en voeg toe aan PATH
       - name: Install Poetry
         shell: pwsh
         run: |
@@ -33,18 +33,19 @@ jobs:
           $poetryPath = "$env:USERPROFILE\AppData\Roaming\Python\Scripts"
           echo "$poetryPath" >> $env:GITHUB_PATH
 
-      # 4. Controleer Poetry en installeer dependencies
+      # 4️⃣ Install dependencies
       - name: Install dependencies
         run: |
           poetry --version
           poetry config virtualenvs.in-project true
           poetry install --no-interaction --no-ansi
 
-      # 5. Build executable met PyInstaller
+      # 5️⃣ Build executable met PyInstaller
       - name: Build executable
-        run: poetry run pyinstaller --onefile frankinator.py
+        run: |
+          poetry run pyinstaller --onefile frankinator.py
 
-      # 6. Upload artifact
+      # 6️⃣ Upload artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
