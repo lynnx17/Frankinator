@@ -37,9 +37,9 @@ jobs:
         poetry --version
 
     - name: Configure Poetry
-  shell: pwsh
-  run: |
-    poetry config virtualenvs.in-project true
+      shell: pwsh
+      run: |
+      poetry config virtualenvs.in-project true
 
 
     - name: Install dependencies
