@@ -2,40 +2,41 @@ name: Build Windows Executable
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   build-windows:
     runs-on: windows-latest
 
-    defaults:
-      run:
-        shell: powershell
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      # Ga naar de innerlijke Frankinator map
+      - name: Change directory to project
+        working-directory: Frankinator
+        run: echo "Building in $(pwd)"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: 3.13
 
-      - name: Install dependencies
+      - name: Upgrade pip and install dependencies
+        working-directory: Frankinator
         run: |
           python -m pip install --upgrade pip
-          pip install poetry
+          pip install poetry pyinstaller
           poetry install
 
-      - name: Build executable with PyInstaller
+      - name: Build Windows executable
+        working-directory: Frankinator
         run: |
-          poetry run pyinstaller --onefile --windowed launch.py `
-            --add-data "templates;templates" `
-            --add-data "static;static"
+          pyinstaller --onefile --windowed launch.py
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: Frankinator-Windows
-          path: ./dist
+          path: Frankinator/dist/
