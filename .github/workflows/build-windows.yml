@@ -11,45 +11,42 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      # 1. Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Setup Python 3.14
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.14
+      # 2. Setup Python
+      - name: Setup Python 3.14
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.14
 
-    - name: Install and configure Poetry
-      shell: pwsh
-      run: |
-        # Download en installeer Poetry
-        $installer = "$env:TEMP\install-poetry.py"
-        Invoke-WebRequest -Uri https://install.python-poetry.org -OutFile $installer
-        python $installer
+      # 3. Install Poetry en voeg toe aan PATH
+      - name: Install Poetry
+        shell: pwsh
+        run: |
+          $installer = "$env:TEMP\install-poetry.py"
+          Invoke-WebRequest -Uri https://install.python-poetry.org -OutFile $installer
+          python $installer
 
-        # Voeg Poetry toe aan PATH voor deze sessie
-        $poetryPath = "C:\Users\runneradmin\AppData\Roaming\Python\Scripts"
-        $env:PATH += ";$poetryPath"
+          # Voeg Poetry toe aan PATH voor alle volgende stappen
+          $poetryPath = "$env:USERPROFILE\AppData\Roaming\Python\Scripts"
+          echo "$poetryPath" >> $env:GITHUB_PATH
 
-        # Controleer installatie
-        poetry --version
+      # 4. Controleer Poetry en installeer dependencies
+      - name: Install dependencies
+        run: |
+          poetry --version
+          poetry config virtualenvs.in-project true
+          poetry install --no-interaction --no-ansi
 
-        # Configureer virtuele omgeving in projectmap
-        poetry config virtualenvs.in-project true
+      # 5. Build executable met PyInstaller
+      - name: Build executable
+        run: poetry run pyinstaller --onefile frankinator.py
 
-    - name: Install dependencies
-      shell: pwsh
-      run: |
-        poetry install --no-interaction --no-ansi
-
-    - name: Build executable with PyInstaller
-      shell: pwsh
-      run: |
-        # Pas dit aan naar jouw build command
-        poetry run pyinstaller --onefile frankinator.py
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: Frankinator-Windows
-        path: dist/*.exe
+      # 6. Upload artifact
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Frankinator-Windows
+          path: dist/*.exe
