@@ -5,60 +5,51 @@ on:
     branches:
       - main
   pull_request:
-    branches:
-      - main
 
 jobs:
-  build:
+  build-windows:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Set up Python 3.14
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.14'
+    - name: Set up Python 3.14
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.14'
 
-      - name: Install Poetry
-    shell: pwsh
-    run: |
-      # Download de installer naar een tijdelijk bestand
-      $installer = "$env:TEMP\install-poetry.py"
-      Invoke-WebRequest -Uri https://install.python-poetry.org -OutFile $installer
+    - name: Install Poetry
+      shell: pwsh
+      run: |
+        # Download de installer naar een tijdelijk bestand
+        $installer = "$env:TEMP\install-poetry.py"
+        Invoke-WebRequest -Uri https://install.python-poetry.org -OutFile $installer
 
-      # Voer de installer uit met Python
-      python $installer
+        # Voer de installer uit met Python
+        python $installer
 
-      # Voeg Poetry toe aan PATH voor deze sessie
-      $poetryPath = "C:\Users\runneradmin\AppData\Roaming\Python\Scripts"
-      $env:PATH += ";$poetryPath"
+        # Voeg Poetry toe aan PATH voor deze sessie
+        $poetryPath = "C:\Users\runneradmin\AppData\Roaming\Python\Scripts"
+        $env:PATH += ";$poetryPath"
 
-      # Controleer dat Poetry werkt
-      poetry --version
-      
-      - name: Configure Poetry
-        shell: pwsh
-        run: |
-          $env:PATH += ";C:\Users\runneradmin\AppData\Roaming\Python\Scripts"
-          poetry config virtualenvs.in-project true
+        # Controleer installatie
+        poetry --version
 
-      - name: Install dependencies
-        shell: pwsh
-        run: |
-          $env:PATH += ";C:\Users\runneradmin\AppData\Roaming\Python\Scripts"
-          poetry install --no-interaction --no-ansi
+    - name: Configure Poetry
+      shell: pwsh
+      run: |
+        # Zorg dat de virtuele omgeving in de projectmap komt
+        poetry config virtualenvs.in-project true
 
-      - name: Run PyInstaller build
-        shell: pwsh
-        run: |
-          $env:PATH += ";C:\Users\runneradmin\AppData\Roaming\Python\Scripts"
-          # Pas hier aan naar jouw entry script
-          poetry run pyinstaller --onefile Frankinator.py
+    - name: Install dependencies
+      shell: pwsh
+      run: |
+        poetry install --no-interaction --no-ansi
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: frankinator-windows
-          path: dist/Frankinator.exe
+    - name: Run build (example: PyInstaller)
+      shell: pwsh
+      run: |
+        # Optioneel: bouw je exe of distributable
+        # Pas aan naar jouw build command
+        poetry run pyinstaller --onefile frankinator.py
