@@ -14,7 +14,7 @@ jobs:
 
       - name: Install dependencies
         run: poetry install
-        working-directory: ./  # Zorg dat dit de map is waar pyproject.toml staat
+        working-directory: ./Frankinator  # <--- pas dit aan naar de folder waar pyproject.toml staat
 
       - name: Build Windows exe
         run: |
@@ -24,10 +24,10 @@ jobs:
             --add-data "templates;templates" ^
             --add-data "static;static" ^
             launch.py
-        working-directory: ./  # dezelfde map
-      
+        working-directory: ./Frankinator  # <--- ook hier
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: Frankinator-windows
-          path: dist/
+          path: ./Frankinator/dist/  # <--- path aanpassen
